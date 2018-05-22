@@ -1,6 +1,7 @@
 // Requires. Importación de librerías.
 var express = require('express');
 var mongoose = require('mongoose');
+
 // Inicializar variables
 var app = express();
 
@@ -10,15 +11,14 @@ mongoose.connection.openUri('mongodb://localhost:27017/hospitalDB', (err, res) =
     console.log('Database running on port 27017: \x1b[32m%s\x1b[0m', 'online');
 });
 
-// Rutas...
+// importar rutas
+var appRoutes = require('./routes/app');
+var userRoutes = require('./routes/user');
 
-app.get('/', (req, res, next) => {
-    res.status(200).json({
-        ok: true,
-        mensaje: "Petición correcta"
-    });
 
-});
+// Rutas
+app.use('/user', userRoutes);
+app.use('/', appRoutes);
 
 //Inicializamos el servidor. Escuchar peticiones.
 app.listen(3000, () => {
