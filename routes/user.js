@@ -1,10 +1,13 @@
 var express = require('express');
 var bcrypt = require('bcryptjs');
 
+
 var app = express();
 
 var User = require('../models/user');
 var Constants = require('../lib/constants');
+var Config = require('../lib/config');
+var mdAuthetication = require('../middlewares/authentication');
 //----------------------------
 // Obtener todos los usuarios.
 //----------------------------
@@ -56,17 +59,16 @@ app.get('/:id', (req, res) => {
         });
     });
 });
-
 //----------------------------
 // Crear un nuevo usuario.
 //----------------------------
-app.post('/', (req, res) => {
+app.post('/', mdAuthetication.verifyToken, (req, res) => {
 
     var body = req.body; // Esto lo hace el body-parser
 
     // Movemos los valores que vienen en el body al usuario.
     // Esta variable user viene del modelo user.js
-    var salt = bcrypt.genSaltSync(Constants.BCRYPT_SALT);
+    var salt = bcrypt.genSaltSync(Config.BCRYPT_SALT);
 
     var user = new User({
 
@@ -99,6 +101,7 @@ app.post('/', (req, res) => {
         });
     });
 });
+
 //----------------------------
 // Actualizar un usuario.
 //----------------------------
