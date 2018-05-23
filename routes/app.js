@@ -1,11 +1,12 @@
 var express = require('express');
+var Constants = require('../lib/constants');
 
 var app = express();
 
 app.get('/', (req, res, next) => {
-    res.status(200).json({
+    res.status(Constants.HTTP_OK).json({
         ok: true,
-        mensaje: "Petición correcta"
+        message: "Petición correcta"
     });
 
 });
