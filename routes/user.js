@@ -97,7 +97,8 @@ app.post('/', mdAuthetication.verifyToken, (req, res) => {
 
         res.status(Constants.HTTP_CREATED).json({
             ok: true,
-            user: finalUser
+            user: finalUser,
+            sessionUser: req.sessionUser
         });
     });
 });
@@ -105,7 +106,7 @@ app.post('/', mdAuthetication.verifyToken, (req, res) => {
 //----------------------------
 // Actualizar un usuario.
 //----------------------------
-app.put('/:id', (req, res) => {
+app.put('/:id', mdAuthetication.verifyToken, (req, res) => {
 
     var id = req.params.id;
 
@@ -154,7 +155,7 @@ app.put('/:id', (req, res) => {
 //----------------------------
 // Borrar un usuario.
 //----------------------------
-app.delete('/:id', (req, res) => {
+app.delete('/:id', mdAuthetication.verifyToken, (req, res) => {
     var id = req.params.id;
 
     User.findByIdAndRemove(id).select('name email').exec((err, userDeleted) => {

@@ -1,8 +1,7 @@
- var Constants = require('../lib/constants');
- var Config = require('../lib/config');
  var jwt = require('jsonwebtoken');
 
-
+ var SEED = require('../lib/config').JWT_SEED;
+ var UNAUTHORIZED = require('../lib/constants').HTTP_UNAUTHORIZED;
  //----------------------------
  // Verificar token.
  //----------------------------
@@ -10,21 +9,24 @@
 
      var token = req.query.token;
      if (!token) {
-         return res.status(Constants.HTTP_UNAUTHORIZED).json({
+         return res.status(UNAUTHORIZED).json({
              ok: false,
              message: 'Token inválido.',
              errors: { message: 'Token inválido.' }
          });
      }
 
-     jwt.verify(token, Config.JWT_SEED, (err, decoded) => {
+     jwt.verify(token, SEED, (err, decoded) => {
          if (err) {
-             return res.status(Constants.HTTP_UNAUTHORIZED).json({
+             return res.status(UNAUTHORIZED).json({
                  ok: false,
                  message: 'Token inválido.',
                  errors: err
              });
          }
+
+         // Incluimos la información del usuario del token en la salida.
+         req.sessionUser = decoded.user;
          next();
      });
 
