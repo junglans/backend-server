@@ -1,7 +1,8 @@
 var express = require('express');
 var app = express();
-var Hospital = require('../models/hospital');
+
 var HTTP_OK = require('../lib/constants').HTTP_OK;
+var HTTP_CREATED = require('../lib/constants').HTTP_CREATED;
 var HTTP_BAD_REQUEST = require('../lib/constants').HTTP_BAD_REQUEST;
 var HTTP_INTERNAL_SERVER_ERROR = require('../lib/constants').HTTP_INTERNAL_SERVER_ERROR;
 var mdAuthetication = require('../middlewares/authentication');
@@ -11,7 +12,7 @@ var Hospital = require('../models/hospital');
 // ----------------------------
 app.get('/', (req, res) => {
 
-    Hospital.find({}).exec((err, hospitals) => {
+    Hospital.find({}).populate('user', 'name email -_id').exec((err, hospitals) => {
         if (err) {
             res.status(HTTP_INTERNAL_SERVER_ERROR).json({
                 ok: false,
@@ -31,7 +32,7 @@ app.get('/', (req, res) => {
 // ------------------------------
 app.get('/:id', (req, res) => {
     var id = req.params.id;
-    Hospital.findById(id).exec((err, hospital) => {
+    Hospital.findById(id).populate('user', 'name email -_id').exec((err, hospital) => {
         if (err) {
             return res.status(HTTP_INTERNAL_SERVER_ERROR).json({
                 ok: false,
@@ -82,7 +83,7 @@ app.post('/', mdAuthetication.verifyToken, (req, res) => {
             });
         }
 
-        res.status(HTTP_OK).json({
+        res.status(HTTP_CREATED).json({
             ok: true,
             message: 'Petición correcta',
             hospital: newHospital
