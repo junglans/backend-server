@@ -171,7 +171,7 @@ app.delete('/:id', mdAuthetication.verifyToken, (req, res) => {
         if (!userDeleted) {
             return res.status(Constants.HTTP_BAD_REQUEST).json({
                 ok: false,
-                message: "No existe un usaurio con ese ID",
+                message: "No existe un usuario con ese ID",
                 errors: { message: "No existe un usuario con ese ID" }
             });
         }
