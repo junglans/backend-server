@@ -11,28 +11,37 @@ var Hospital = require('../models/hospital');
 // Obtener todos los hospitales
 // ----------------------------
 app.get('/', (req, res) => {
+    var from = Number(req.query.from || 0);
+    Hospital.find({})
+        .skip(from)
+        .limit(5)
+        .populate('user', 'name email')
+        .exec((err, hospitals) => {
+            if (err) {
+                res.status(HTTP_INTERNAL_SERVER_ERROR).json({
+                    ok: false,
+                    message: 'Error cargando hospitales!!',
+                    errors: err
+                });
+            }
 
-    Hospital.find({}).populate('user', 'name email -_id').exec((err, hospitals) => {
-        if (err) {
-            res.status(HTTP_INTERNAL_SERVER_ERROR).json({
-                ok: false,
-                message: 'Error cargando hospitales!!',
-                errors: err
+            Hospital.count({}, (err, count) => {
+                res.status(HTTP_OK).json({
+                    ok: true,
+                    message: 'Petición correcta',
+                    hospitals: hospitals,
+                    total: count
+                });
             });
-        }
-        res.status(HTTP_OK).json({
-            ok: true,
-            message: 'Petición correcta',
-            hospitals: hospitals
+
         });
-    });
 });
 // ------------------------------
 // Obtener un hospital por su id
 // ------------------------------
 app.get('/:id', (req, res) => {
     var id = req.params.id;
-    Hospital.findById(id).populate('user', 'name email -_id').exec((err, hospital) => {
+    Hospital.findById(id).populate('user', 'name email').exec((err, hospital) => {
         if (err) {
             return res.status(HTTP_INTERNAL_SERVER_ERROR).json({
                 ok: false,

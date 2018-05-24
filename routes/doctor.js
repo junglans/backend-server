@@ -12,10 +12,12 @@ var Doctor = require('../models/doctor');
 // Obtener todos los doctores.
 // ---------------------------
 app.get('/', (req, res) => {
-
+    var from = Number(req.query.from || 0);
     Doctor.find({})
-        .populate('user', 'name email -_id')
-        .populate('hospital', 'name -_id')
+        .skip(from)
+        .limit(5)
+        .populate('user', 'name email')
+        .populate('hospital')
         .exec((err, doctors) => {
 
             if (err) {
@@ -25,12 +27,15 @@ app.get('/', (req, res) => {
                     errors: err
                 });
             }
-
-            res.status(HTTP_OK).json({
-                ok: true,
-                message: 'Petición realizada',
-                doctors: doctors
+            Doctor.count({}, (err, count) => {
+                res.status(HTTP_OK).json({
+                    ok: true,
+                    message: 'Petición realizada',
+                    doctors: doctors,
+                    total: count
+                });
             });
+
         });
 
 });
@@ -42,8 +47,8 @@ app.get('/:id', (req, res) => {
     var id = req.params.id;
 
     Doctor.findById(id)
-        .populate('user', 'name email -_id')
-        .populate('hospital', 'name -_id')
+        .populate('user', 'name email')
+        .populate('hospital', 'name')
         .exec((err, doctor) => {
 
             if (err) {

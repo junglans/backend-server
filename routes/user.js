@@ -12,22 +12,31 @@ var mdAuthetication = require('../middlewares/authentication');
 // Obtener todos los usuarios.
 //----------------------------
 app.get('/', (req, res, next) => {
-    User.find({}, '-password').exec((err, users) => {
-        //  User.find({}, '_id, name email img role').exec((err, users) => {
 
-        if (err) {
-            return res.status(Constants.HTTP_INTERNAL_SERVER_ERROR).json({
-                ok: false,
-                message: "Error cargando usuarios!!",
-                errors: err
+    var from = Number(req.query.from || 0);
+
+    User.find({}, '-password')
+        .skip(from)
+        .limit(5)
+        .exec((err, users) => {
+            //  User.find({}, '_id, name email img role').exec((err, users) => {
+
+            if (err) {
+                return res.status(Constants.HTTP_INTERNAL_SERVER_ERROR).json({
+                    ok: false,
+                    message: "Error cargando usuarios!!",
+                    errors: err
+                });
+            }
+            User.count({}, (err, count) => {
+                return res.status(Constants.HTTP_OK).json({
+                    ok: true,
+                    users: users,
+                    total: count
+                });
             });
-        }
 
-        res.status(Constants.HTTP_OK).json({
-            ok: true,
-            users: users
         });
-    });
 });
 //------------------------------
 // Obtener un usuario por su id.
