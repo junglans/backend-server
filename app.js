@@ -19,6 +19,7 @@ mongoose.connection.openUri('mongodb://localhost:27017/hospitalDB', (err, res) =
 });
 
 // importar rutas
+var uploadRoutes = require('./routes/upload');
 var searchRoutes = require('./routes/search');
 var doctorRoutes = require('./routes/doctor');
 var hospitalRoutes = require('./routes/hospital');
@@ -28,6 +29,7 @@ var loginRoutes = require('./routes/login');
 
 
 // Rutas
+app.use('/upload', uploadRoutes);
 app.use('/search', searchRoutes);
 app.use('/doctor', doctorRoutes);
 app.use('/hospital', hospitalRoutes);

@@ -1,5 +1,6 @@
 var express = require('express');
 var HTTP_OK = require('../lib/constants').HTTP_OK;
+var HTTP_BAD_REQUEST = require('../lib/constants').HTTP_BAD_REQUEST;
 var HTTP_INTERNAL_SERVER_ERROR = require('../lib/constants').HTTP_INTERNAL_SERVER_ERROR;
 
 
@@ -41,24 +42,37 @@ app.get('/all/:criteria', (req, res) => {
 // ---------------------
 // Búsqueda por colección
 // ---------------------
-app.get('/entity/:name/:criteria', (req, res) => {
+app.get('/entity/:entity/:criteria', (req, res) => {
 
     var entity = req.params.entity;
     var criteria = req.params.criteria;
+
     var regex = new RegExp(criteria, 'i');
 
-    Promise.all(
-        [searchHospitals(regex),
-            searchUsers(regex),
-            searchDoctors(regex)
-        ]
-    ).then((result) => {
+    var funct = null;
+    switch (entity) {
+        case 'users':
+            funct = searchUsers;
+            break;
+        case 'doctors':
+            funct = searchDoctors;
+            break;
+        case 'hospitals':
+            funct = searchHospitals;
+            break;
+        default:
+            return res.status(HTTP_BAD_REQUEST).json({
+                ok: false,
+                message: 'Se ha producido un error.',
+                errors: { message: 'Se ha producido un error.' }
+            });
+    }
+
+    funct(regex).then((result) => {
         res.status(HTTP_OK).json({
             ok: true,
             message: 'Petición realizada correctamente',
-            hospitals: result[0],
-            users: result[1],
-            doctors: result[2]
+            [entity]: result
         });
     }).catch((err) => {
         res.status(HTTP_INTERNAL_SERVER_ERROR).json({
