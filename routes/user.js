@@ -71,7 +71,7 @@ app.get('/:id', (req, res) => {
 //----------------------------
 // Crear un nuevo usuario.
 //----------------------------
-app.post('/', mdAuthetication.verifyToken, (req, res) => {
+app.post('/', (req, res) => {
 
     var body = req.body; // Esto lo hace el body-parser
 
