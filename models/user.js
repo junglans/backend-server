@@ -33,6 +33,11 @@ var userSchema = new Schema({
         default: 'USER_ROLE',
         enum: validRoles
     },
+    google: {
+        type: Boolean,
+        required: true,
+        default: false
+    }
 
 });
 
