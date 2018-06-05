@@ -34,9 +34,11 @@ var hospitalRoutes = require('./routes/hospital');
 var appRoutes = require('./routes/app');
 var userRoutes = require('./routes/user');
 var loginRoutes = require('./routes/login');
+var imgRoutes = require('./routes/images');
 
 
 // Rutas
+app.use('/img', imgRoutes);
 app.use('/upload', uploadRoutes);
 app.use('/search', searchRoutes);
 app.use('/doctor', doctorRoutes);
