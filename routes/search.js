@@ -19,9 +19,9 @@ app.get('/all/:criteria', (req, res) => {
 
     Promise.all(
         [
-            searchHospitals(regex),
-            searchUsers(regex),
-            searchDoctors(regex)
+            searchHospitals(req, regex),
+            searchUsers(req, regex),
+            searchDoctors(req, regex)
         ]
     ).then((result) => {
         res.status(HTTP_OK).json({
@@ -68,11 +68,12 @@ app.get('/entity/:entity/:criteria', (req, res) => {
             });
     }
 
-    funct(regex).then((result) => {
+    funct(req, regex).then((result) => {
         res.status(HTTP_OK).json({
             ok: true,
             message: 'Petición realizada correctamente',
-            [entity]: result
+            [entity]: result.records,
+            total: result.total
         });
     }).catch((err) => {
         res.status(HTTP_INTERNAL_SERVER_ERROR).json({
@@ -84,21 +85,29 @@ app.get('/entity/:entity/:criteria', (req, res) => {
 
 });
 
-function searchUsers(regex) {
+function searchUsers(req, regex) {
+    var from = Number(req.query.from || 0);
+    console.log("FROM :" + from);
     return new Promise((resolve, reject) => {
         User.find({}, '-password')
             .or([{ name: regex }, { email: regex }])
+            .skip(from)
+            .limit(5)
             .exec((err, result) => {
                 if (err) {
                     reject({ message: 'Error buscando usuarios', errors: err });
                 } else {
-                    resolve(result);
+                    User.count()
+                        .or([{ name: regex }, { email: regex }])
+                        .exec({}, (err, count) => {
+                            resolve({ records: result, total: count });
+                        });;
                 }
             })
     });
 }
 
-function searchHospitals(regex) {
+function searchHospitals(req, regex) {
     return new Promise((resolve, reject) => {
         Hospital.find({ name: regex }).populate('user', '-password').exec((err, result) => {
             if (err) {
@@ -110,7 +119,7 @@ function searchHospitals(regex) {
     });
 }
 
-function searchDoctors(regex) {
+function searchDoctors(req, regex) {
     return new Promise((resolve, reject) => {
         Doctor.find({ name: regex })
             .populate('user', '-password')
