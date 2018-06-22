@@ -85,9 +85,37 @@ app.get('/entity/:entity/:criteria', (req, res) => {
 
 });
 
+function searchHospitals(req, regex) {
+    return new Promise((resolve, reject) => {
+        Hospital.find({ name: regex })
+            .populate('user', '-password')
+            .exec((err, result) => {
+                if (err) {
+                    reject({ message: 'Error buscando hospitales', errors: err });
+                } else {
+                    resolve({ records: result });
+                }
+            })
+    });
+}
+
+function searchDoctors(req, regex) {
+    return new Promise((resolve, reject) => {
+        Doctor.find({ name: regex })
+            .populate('user', '-password')
+            .populate('hospital')
+            .exec((err, result) => {
+                if (err) {
+                    reject({ message: 'Error buscando médicos', errors: err });
+                } else {
+                    resolve({ records: result });
+                }
+            })
+    });
+}
+
 function searchUsers(req, regex) {
     var from = Number(req.query.from || 0);
-    console.log("FROM :" + from);
     return new Promise((resolve, reject) => {
         User.find({}, '-password')
             .or([{ name: regex }, { email: regex }])
@@ -101,37 +129,9 @@ function searchUsers(req, regex) {
                         .or([{ name: regex }, { email: regex }])
                         .exec({}, (err, count) => {
                             resolve({ records: result, total: count });
-                        });;
+                        });
                 }
             })
     });
 }
-
-function searchHospitals(req, regex) {
-    return new Promise((resolve, reject) => {
-        Hospital.find({ name: regex }).populate('user', '-password').exec((err, result) => {
-            if (err) {
-                reject({ message: 'Error buscando hospitales', errors: err });
-            } else {
-                resolve(result);
-            }
-        })
-    });
-}
-
-function searchDoctors(req, regex) {
-    return new Promise((resolve, reject) => {
-        Doctor.find({ name: regex })
-            .populate('user', '-password')
-            .populate('hospital')
-            .exec((err, result) => {
-                if (err) {
-                    reject({ message: 'Error buscando médicos', errors: err });
-                } else {
-                    resolve(result);
-                }
-            })
-    });
-};
-
 module.exports = app;
