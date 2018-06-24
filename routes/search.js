@@ -86,14 +86,22 @@ app.get('/entity/:entity/:criteria', (req, res) => {
 });
 
 function searchHospitals(req, regex) {
+    var from = Number(req.query.from || 0);
     return new Promise((resolve, reject) => {
         Hospital.find({ name: regex })
             .populate('user', '-password')
+            .skip(from)
+            .limit(5)
             .exec((err, result) => {
                 if (err) {
                     reject({ message: 'Error buscando hospitales', errors: err });
                 } else {
-                    resolve({ records: result });
+                    Hospital.count()
+                        .or([{ name: regex }])
+                        .exec({}, (err, count) => {
+                            resolve({ records: result, total: count });
+                        });
+
                 }
             })
     });
