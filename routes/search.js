@@ -116,7 +116,12 @@ function searchDoctors(req, regex) {
                 if (err) {
                     reject({ message: 'Error buscando médicos', errors: err });
                 } else {
-                    resolve({ records: result });
+                    Doctor.count()
+                        .or([{ name: regex }])
+                        .exec({}, (err, count) => {
+                            resolve({ records: result, total: count });
+                        });
+
                 }
             })
     });
