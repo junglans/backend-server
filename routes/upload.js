@@ -103,7 +103,7 @@ function assignImageToHospital(id, fileName, res) {
             res.status(HTTP_OK).json({
                 ok: true,
                 message: "Petición correcta.",
-                user: entity
+                hospital: entity
             });
         });
     });
@@ -133,7 +133,7 @@ function assignImageToDoctor(id, fileName, res) {
             res.status(HTTP_OK).json({
                 ok: true,
                 message: "Petición correcta.",
-                user: entity
+                doctor: entity
             });
 
         });
