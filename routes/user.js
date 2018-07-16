@@ -7,7 +7,7 @@ var app = express();
 var User = require('../models/user');
 var Constants = require('../lib/constants');
 var Config = require('../lib/config');
-var mdAuthetication = require('../middlewares/authentication');
+var mdAuthentication = require('../middlewares/authentication');
 //----------------------------
 // Obtener todos los usuarios.
 //----------------------------
@@ -71,7 +71,7 @@ app.get('/:id', (req, res) => {
 //----------------------------
 // Crear un nuevo usuario.
 //----------------------------
-app.post('/', (req, res) => {
+app.post('/', [mdAuthentication.verifyToken, mdAuthentication.verifyAdminToken], (req, res) => {
 
     var body = req.body; // Esto lo hace el body-parser
 
@@ -115,7 +115,7 @@ app.post('/', (req, res) => {
 //----------------------------
 // Actualizar un usuario.
 //----------------------------
-app.put('/:id', mdAuthetication.verifyToken, (req, res) => {
+app.put('/:id', [mdAuthentication.verifyToken, mdAuthentication.verifyAdminOrSelfToken], (req, res) => {
 
     var id = req.params.id;
 
@@ -164,7 +164,7 @@ app.put('/:id', mdAuthetication.verifyToken, (req, res) => {
 //----------------------------
 // Borrar un usuario.
 //----------------------------
-app.delete('/:id', mdAuthetication.verifyToken, (req, res) => {
+app.delete('/:id', [mdAuthentication.verifyToken, mdAuthentication.verifyAdminToken], (req, res) => {
     var id = req.params.id;
 
     User.findByIdAndRemove(id).select('name email').exec((err, userDeleted) => {

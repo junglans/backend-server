@@ -14,6 +14,7 @@ var User = require('../models/user');
 const HTTP_OK = require('../lib/constants').HTTP_OK;
 const HTTP_BAD_REQUEST = require('../lib/constants').HTTP_BAD_REQUEST;
 const HTTP_INTERNAL_SERVER_ERROR = require('../lib/constants').HTTP_INTERNAL_SERVER_ERROR;
+const ADMIN_ROLE_ID = require('../lib/constants').ADMIN_ROLE_ID;
 var app = express();
 // ===========================
 // Login normal
@@ -54,7 +55,8 @@ app.post('/', (req, res) => {
             ok: true,
             message: "Petición login correcta",
             token: token,
-            user: user
+            user: user,
+            menu: getMenu(user.role)
         });
     });
 
@@ -136,6 +138,7 @@ app.post('/google', async(req, res) => {
                     message: 'Solicitud correcta!!',
                     token: token,
                     user: userStored,
+                    menu: getMenu(userStored.role)
                 });
 
             });
@@ -154,7 +157,8 @@ app.post('/google', async(req, res) => {
                 ok: true,
                 message: "Petición login correcta",
                 token: token,
-                user: userDB
+                user: userDB,
+                menu: getMenu(userDB.role)
             });
 
         }
@@ -163,4 +167,74 @@ app.post('/google', async(req, res) => {
 
 });
 
+function getMenu(role) {
+    var menu = {
+        menuItems: [{
+            title: 'PERSONAL',
+            icon: 'mdi mdi-gauge',
+            url: '',
+            submenus: [{
+                    title: 'Dashboard',
+                    icon: '',
+                    url: '/dashboard',
+                    submenus: []
+                },
+                {
+                    title: 'Gráficas',
+                    icon: '',
+                    url: '/graficas1',
+                    submenus: []
+                },
+                {
+                    title: 'Progress',
+                    icon: '',
+                    url: '/progress',
+                    submenus: []
+                },
+                {
+                    title: 'Promesas',
+                    icon: '',
+                    url: '/promises',
+                    submenus: []
+                },
+                {
+                    title: 'Rxjs',
+                    icon: '',
+                    url: '/rxjs',
+                    submenus: []
+                }
+            ]
+        }]
+    };
+
+    if (role === ADMIN_ROLE_ID) {
+        var maintenanceMenu = {
+            title: 'MANTENIMIENTOS',
+            icon: 'mdi mdi-folder-lock-open',
+            url: '',
+            submenus: [{
+                    title: 'Usuarios',
+                    icon: '',
+                    url: '/users',
+                    submenus: []
+                },
+                {
+                    title: 'Hospitales',
+                    icon: '',
+                    url: '/hospitals',
+                    submenus: []
+                },
+                {
+                    title: 'Médicos',
+                    icon: '',
+                    url: '/doctors',
+                    submenus: []
+                }
+            ]
+        }
+        menu.menuItems.push(maintenanceMenu);
+    }
+
+    return menu;
+}
 module.exports = app;

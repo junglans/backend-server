@@ -5,7 +5,7 @@ var HTTP_OK = require('../lib/constants').HTTP_OK;
 var HTTP_CREATED = require('../lib/constants').HTTP_CREATED;
 var HTTP_BAD_REQUEST = require('../lib/constants').HTTP_BAD_REQUEST;
 var HTTP_INTERNAL_SERVER_ERROR = require('../lib/constants').HTTP_INTERNAL_SERVER_ERROR;
-var mdAuthetication = require('../middlewares/authentication');
+var mdAuthentication = require('../middlewares/authentication');
 var Hospital = require('../models/hospital');
 // ----------------------------
 // Obtener todos los hospitales
@@ -69,7 +69,7 @@ app.get('/:id', (req, res) => {
 // ------------------------------
 // Crear un hospital
 // ------------------------------
-app.post('/', mdAuthetication.verifyToken, (req, res) => {
+app.post('/', [mdAuthentication.verifyToken, mdAuthentication.verifyAdminToken], (req, res) => {
 
     var body = req.body;
 
@@ -102,7 +102,7 @@ app.post('/', mdAuthetication.verifyToken, (req, res) => {
 // ------------------------------
 // Actualizar un hospital
 // ------------------------------
-app.put('/:id', mdAuthetication.verifyToken, (req, res) => {
+app.put('/:id', [mdAuthentication.verifyToken, mdAuthentication.verifyAdminToken], (req, res) => {
 
     var id = req.params.id;
 
@@ -149,7 +149,7 @@ app.put('/:id', mdAuthetication.verifyToken, (req, res) => {
 // ------------------------------
 // Borrar un hospital
 // ------------------------------
-app.delete('/:id', mdAuthetication.verifyToken, (req, res) => {
+app.delete('/:id', [mdAuthentication.verifyToken, mdAuthentication.verifyAdminToken], (req, res) => {
     var id = req.params.id;
 
     Hospital.findByIdAndRemove(id, (err, deletedHospital) => {
