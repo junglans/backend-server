@@ -111,7 +111,49 @@ app.post('/', [mdAuthentication.verifyToken, mdAuthentication.verifyAdminToken],
         });
     });
 });
+//----------------------------
+// Registrar un nuevo usuario.
+//----------------------------
+app.post('/register', (req, res) => {
 
+    var body = req.body; // Esto lo hace el body-parser
+
+    // Movemos los valores que vienen en el body al usuario.
+    // Esta variable user viene del modelo user.js
+    var salt = bcrypt.genSaltSync(Config.BCRYPT_SALT);
+
+    var user = new User({
+
+        name: body.name,
+        email: body.email,
+        img: body.img,
+        password: bcrypt.hashSync(body.password, salt),
+        role: body.role
+
+    });
+
+    // Almacenamos el usuario en mongo
+    user.save((err, finalUser) => {
+
+        if (err) {
+            var httpStatus = Constants.HTTP_INTERNAL_SERVER_ERROR;
+            if (err.name === 'ValidationError') {
+                httpStatus = Constants.HTTP_BAD_REQUEST;
+            }
+            return res.status(httpStatus).json({
+                ok: false,
+                message: "Error creando usuarios.",
+                errors: err
+            });
+        }
+
+        res.status(Constants.HTTP_CREATED).json({
+            ok: true,
+            user: finalUser,
+            sessionUser: req.sessionUser
+        });
+    });
+});
 //----------------------------
 // Actualizar un usuario.
 //----------------------------
