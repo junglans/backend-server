@@ -9,13 +9,27 @@ const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(CLIENT_ID);
 
 var User = require('../models/user');
+var mdAuthentication = require('../middlewares/authentication');
 
 // HTTP Return codes...
 const HTTP_OK = require('../lib/constants').HTTP_OK;
 const HTTP_BAD_REQUEST = require('../lib/constants').HTTP_BAD_REQUEST;
 const HTTP_INTERNAL_SERVER_ERROR = require('../lib/constants').HTTP_INTERNAL_SERVER_ERROR;
 const ADMIN_ROLE_ID = require('../lib/constants').ADMIN_ROLE_ID;
+
 var app = express();
+// ===========================
+// Renueva token
+// ===========================
+app.get('/renewtoken', [mdAuthentication.verifyToken], (req, res) => {
+
+    var token = jwt.sign({ user: req.sessionUser }, JWT_SEED, { expiresIn: 14400 });
+    res.status(HTTP_OK).json({
+        ok: true,
+        message: "Petición login correcta",
+        token: token
+    });
+});
 // ===========================
 // Login normal
 // ===========================
